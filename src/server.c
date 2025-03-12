@@ -3738,17 +3738,28 @@ int main(int argc, char **argv) {
 
     /* We need to initialize our libraries, and the server configuration. */
 #ifdef INIT_SETPROCTITLE_REPLACEMENT
+    // Initialize setproctitle replacement 
+    // 初始化进程名称修改为后续的setproctitle做准备
     spt_init(argc, argv);
 #endif
     setlocale(LC_COLLATE,"");
+    // 当redis内存不足的时候，自动调用 redisOutOfMemoryHandler 方法
+    // zmalloc.c  redis内存管理系统的一部分
     zmalloc_set_oom_handler(redisOutOfMemoryHandler);
+    // 生成随机种子
     srand(time(NULL)^getpid());
+    // 获取系统当前的时间
     gettimeofday(&tv,NULL);
     char hashseed[16];
+    // 生成制定长度的随机十六进制字符串 
     getRandomHexChars(hashseed,sizeof(hashseed));
+    // 设置字典的hash函数种子
     dictSetHashFunctionSeed((uint8_t*)hashseed);
+    // 检查是否是sentinel模式 哨兵模式启动
     server.sentinel_mode = checkForSentinelMode(argc,argv);
+    // 初始化Redis服务器的参数配置
     initServerConfig();
+    // Redis模块化
     moduleInitModulesSystem();
 
     /* Store the executable path and arguments in a safe place in order
