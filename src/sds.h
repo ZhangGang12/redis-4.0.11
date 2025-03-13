@@ -44,44 +44,45 @@ typedef char *sds;
 /* Note: sdshdr5 is never used, we just access the flags byte directly.
  * However is here to document the layout of type 5 SDS strings. */
 struct __attribute__ ((__packed__)) sdshdr5 {
-    unsigned char flags; /* 3 lsb of type, and 5 msb of string length */
+    unsigned char flags; /* 3 lsb of type, and 5 msb of string length */ //小于1字节
     char buf[];
 };
 struct __attribute__ ((__packed__)) sdshdr8 {
-    uint8_t len; /* used */
-    uint8_t alloc; /* excluding the header and null terminator */
-    unsigned char flags; /* 3 lsb of type, 5 unused bits */
+    uint8_t len; /* used */ // 一个字节  已经使用长度
+    uint8_t alloc; /* excluding the header and null terminator */ // 一个字节 总长度
+    unsigned char flags; /* 3 lsb of type, 5 unused bits */ // 3个位标识类型 5个位未使用
     char buf[];
 };
 struct __attribute__ ((__packed__)) sdshdr16 {
-    uint16_t len; /* used */
-    uint16_t alloc; /* excluding the header and null terminator */
-    unsigned char flags; /* 3 lsb of type, 5 unused bits */
+    uint16_t len; /* used */ // 2个字节
+    uint16_t alloc; /* excluding the header and null terminator */ // 2个字节
+    unsigned char flags; /* 3 lsb of type, 5 unused bits */ // 3个位标识类型 5个位未使用
     char buf[];
 };
 struct __attribute__ ((__packed__)) sdshdr32 {
-    uint32_t len; /* used */
-    uint32_t alloc; /* excluding the header and null terminator */
+    uint32_t len; /* used */ // 4个字节
+    uint32_t alloc; /* excluding the header and null terminator */ // 4个字节
     unsigned char flags; /* 3 lsb of type, 5 unused bits */
     char buf[];
 };
 struct __attribute__ ((__packed__)) sdshdr64 {
-    uint64_t len; /* used */
-    uint64_t alloc; /* excluding the header and null terminator */
+    uint64_t len; /* used */ // 8个字节
+    uint64_t alloc; /* excluding the header and null terminator */ // 8个字节
     unsigned char flags; /* 3 lsb of type, 5 unused bits */
     char buf[];
 };
 
-#define SDS_TYPE_5  0
-#define SDS_TYPE_8  1
-#define SDS_TYPE_16 2
-#define SDS_TYPE_32 3
-#define SDS_TYPE_64 4
+// 表示五种sds类型 
+#define SDS_TYPE_5  0  //长度小于1字节 5bit (< 32 字节) 2^5 = 32 - 1 = 31
+#define SDS_TYPE_8  1  //长度为1字节 8bit (< 256 字节) 2^8 = 256 - 1 = 255
+#define SDS_TYPE_16 2  //长度为2字节 16bit (< 65536 字节) 2^16 = 65536 - 1 = 65535
+#define SDS_TYPE_32 3  //长度为4字节 32bit (< 4294967296 字节) 2^32 = 4294967296 - 1 = 4294967295
+#define SDS_TYPE_64 4  //长度为8字节 64bit (< 18446744073709551616 字节) 2^64 = 18446744073709551616 - 1 = 18446744073709551615
 #define SDS_TYPE_MASK 7
 #define SDS_TYPE_BITS 3
 #define SDS_HDR_VAR(T,s) struct sdshdr##T *sh = (void*)((s)-(sizeof(struct sdshdr##T)));
-#define SDS_HDR(T,s) ((struct sdshdr##T *)((s)-(sizeof(struct sdshdr##T))))
-#define SDS_TYPE_5_LEN(f) ((f)>>SDS_TYPE_BITS)
+#define SDS_HDR(T,s) ((struct sdshdr##T *)((s)-(sizeof(struct sdshdr##T)))) //计算字符长度
+#define SDS_TYPE_5_LEN(f) ((f)>>SDS_TYPE_BITS) //计算字符长度
 
 static inline size_t sdslen(const sds s) {
     unsigned char flags = s[-1];

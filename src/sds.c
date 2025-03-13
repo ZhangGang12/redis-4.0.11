@@ -81,23 +81,26 @@ static inline char sdsReqType(size_t string_size) {
  * You can print the string with printf() as there is an implicit \0 at the
  * end of the string. However the string is binary safe and can contain
  * \0 characters in the middle, as the length is stored in the sds header. */
-sds sdsnewlen(const void *init, size_t initlen) {
+sds sdsnewlen(const void *init, size_t initlen) { //增加方法
     void *sh;
     sds s;
+    //根据长度选择类型
     char type = sdsReqType(initlen);
     /* Empty strings are usually created in order to append. Use type 8
      * since type 5 is not good at this. */
+     //特殊兼容 空字符串 使用类型8
     if (type == SDS_TYPE_5 && initlen == 0) type = SDS_TYPE_8;
+    //计算头部长度
     int hdrlen = sdsHdrSize(type);
     unsigned char *fp; /* flags pointer. */
 
-    sh = s_malloc(hdrlen+initlen+1);
+    sh = s_malloc(hdrlen+initlen+1); //+1 为结束符号\0
     if (!init)
         memset(sh, 0, hdrlen+initlen+1);
     if (sh == NULL) return NULL;
-    s = (char*)sh+hdrlen;
-    fp = ((unsigned char*)s)-1;
-    switch(type) {
+    s = (char*)sh+hdrlen; //指向buf的指针
+    fp = ((unsigned char*)s)-1; //指向flage的指针
+    switch(type) { //初始化
         case SDS_TYPE_5: {
             *fp = type | (initlen << SDS_TYPE_BITS);
             break;
@@ -133,8 +136,8 @@ sds sdsnewlen(const void *init, size_t initlen) {
     }
     if (initlen && init)
         memcpy(s, init, initlen);
-    s[initlen] = '\0';
-    return s;
+    s[initlen] = '\0'; //末尾结束符号
+    return s; //返回的是buf指针 
 }
 
 /* Create an empty (zero length) sds string. Even in this case the string
@@ -183,6 +186,8 @@ void sdsupdatelen(sds s) {
  * However all the existing buffer is not discarded but set as free space
  * so that next append operations will not require allocations up to the
  * number of bytes previously available. */
+ // 清空AOF缓冲区 客户端查询缓冲区的 主从复制缓冲区清空
+ // redis很多地方也用sds作为缓冲区的实现
 void sdsclear(sds s) {
     sdssetlen(s, 0);
     s[0] = '\0';
