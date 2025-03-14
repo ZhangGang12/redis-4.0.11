@@ -3759,7 +3759,7 @@ int main(int argc, char **argv) {
     server.sentinel_mode = checkForSentinelMode(argc,argv);
     // 初始化Redis服务器的参数配置
     initServerConfig();
-    // Redis模块化
+    // Redis
     moduleInitModulesSystem();
 
     /* Store the executable path and arguments in a safe place in order

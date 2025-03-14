@@ -333,6 +333,7 @@ typedef long long mstime_t; /* millisecond time type. */
 /* Anti-warning macro... */
 #define UNUSED(V) ((void) V)
 
+//跳表的默认高度
 #define ZSKIPLIST_MAXLEVEL 32 /* Should be enough for 2^32 elements */
 #define ZSKIPLIST_P 0.25      /* Skiplist P = 1/4 */
 
@@ -758,19 +759,20 @@ struct sharedObjectsStruct {
 
 /* ZSETs use a specialized version of Skiplists */
 typedef struct zskiplistNode {
-    sds ele;
-    double score;
-    struct zskiplistNode *backward;
+    sds ele; //元素
+    double score; //分数
+    struct zskiplistNode *backward; //后一个节点
     struct zskiplistLevel {
-        struct zskiplistNode *forward;
-        unsigned int span;
-    } level[];
+        struct zskiplistNode *forward; //本层的下一个节点
+        unsigned int span; //节点与节点之间跳过元素的个数 + 1 的个数 todo 这个记录的是前一个节点到当前节点的跨度还是 当前节点到header节点的跨度
+    } level[]; //柔性数组
 } zskiplistNode;
 
+//管理节点
 typedef struct zskiplist {
     struct zskiplistNode *header, *tail;
-    unsigned long length;
-    int level;
+    unsigned long length; //跳表的长度
+    int level; //跳表的高度
 } zskiplist;
 
 typedef struct zset {
