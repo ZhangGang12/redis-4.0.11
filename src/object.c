@@ -39,7 +39,8 @@
 /* ===================== Creation and parsing of objects ==================== */
 
 robj *createObject(int type, void *ptr) {
-    robj *o = zmalloc(sizeof(*o));
+    //再分配robj
+    robj *o = zmalloc(sizeof(*o)); 
     o->type = type;
     o->encoding = OBJ_ENCODING_RAW;
     o->ptr = ptr;
@@ -75,6 +76,7 @@ robj *makeObjectShared(robj *o) {
 /* Create a string object with encoding OBJ_ENCODING_RAW, that is a plain
  * string object where o->ptr points to a proper sds string. */
 robj *createRawStringObject(const char *ptr, size_t len) {
+    //sdsnewlen是先分配sds，然后进入createObject再分分配obj
     return createObject(OBJ_STRING, sdsnewlen(ptr,len));
 }
 
@@ -82,7 +84,7 @@ robj *createRawStringObject(const char *ptr, size_t len) {
  * an object where the sds string is actually an unmodifiable string
  * allocated in the same chunk as the object itself. */
 robj *createEmbeddedStringObject(const char *ptr, size_t len) {
-    robj *o = zmalloc(sizeof(robj)+sizeof(struct sdshdr8)+len+1);
+    robj *o = zmalloc(sizeof(robj)+sizeof(struct sdshdr8)+len+1); //embstr 只分配一次
     struct sdshdr8 *sh = (void*)(o+1);
 
     o->type = OBJ_STRING;
