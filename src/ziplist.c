@@ -227,6 +227,7 @@
 /* Utility macros.*/
 
 /* Return total bytes a ziplist is composed of. */
+// 
 #define ZIPLIST_BYTES(zl)       (*((uint32_t*)(zl)))
 
 /* Return the offset of the last item inside the ziplist. */
@@ -268,7 +269,7 @@
 /* We use this function to receive information about a ziplist entry.
  * Note that this is not how the data is actually encoded, is just what we
  * get filled by a function in order to operate more easily. */
-typedef struct zlentry {
+typedef struct zlentry { //压缩列表的结构
     unsigned int prevrawlensize; /* Bytes used to encode the previos entry len*/
     unsigned int prevrawlen;     /* Previous entry len. */
     unsigned int lensize;        /* Bytes used to encode this entry type/len.
@@ -575,6 +576,7 @@ void zipEntry(unsigned char *p, zlentry *e) {
 }
 
 /* Create a new empty ziplist. */
+//创建一个空的压缩列表
 unsigned char *ziplistNew(void) {
     unsigned int bytes = ZIPLIST_HEADER_SIZE+1;
     unsigned char *zl = zmalloc(bytes);
