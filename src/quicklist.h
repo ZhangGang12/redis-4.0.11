@@ -75,7 +75,7 @@ typedef struct quicklist {
     quicklistNode *tail;
     unsigned long count;        /* total count of all entries in all ziplists */
     unsigned long len;          /* number of quicklistNodes */
-    int fill : 16;              /* fill factor for individual nodes */
+    int fill : 16;              /* fill factor for individual nodes */  // 表示每个ziplist存储的元素个数 
     unsigned int compress : 16; /* depth of end nodes not to compress;0=off */
 } quicklist;
 
